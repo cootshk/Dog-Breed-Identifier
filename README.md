@@ -1,6 +1,6 @@
 # Classifier
 
- Add short description of project here > 
+Note: the [dusty-nv/jetson-inference] repository is included. If you already have this setup, skip the first few steps.
 
 ![add image descrition here](direct image link here)
 

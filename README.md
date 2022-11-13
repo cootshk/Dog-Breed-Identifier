@@ -15,6 +15,8 @@ THIS PROGRAM REQUIRES A **JETSON NANO**
 3. clone the repository with `sudo git clone --recursive https://github.com/cootshk/hello-ai-world.git`
 4. open the jetson-inference directory `cd jetson-inference`
 5. make a "build" directory `sudo mkdir build`
-6. 
+6. create the project with CMake `cd build;cmake ../`
+7. Install the Google-net image classification models **You do NOT need to install Pytorch**
+8. install the jetson-inference library `make;sudo make install;sudo ldconfig`
 
 [View a video explanation here](video link)

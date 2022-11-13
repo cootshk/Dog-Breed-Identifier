@@ -3,6 +3,10 @@
 import jetson_inference
 import jetson_utils
 import argparse
+import cv2
+
+vc = cv2.VideoCapture(0)
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("devicepath", type=str, help="path to the device to proccess")

@@ -29,7 +29,7 @@ THIS PROGRAM REQUIRES A **JETSON NANO**
 ### Installing the [Jetson-Inference](https://www.github.com/dusty-nv/jetson-inference) library
 1. update and install git and cmake `sudo apt update;sudo apt upgrade;sudo apt install git cmake`
 2. install the required python packages `sudo apt install libpython3-dev python3-numpy`
-3. clone the repository with `git clone https://github.com/cootshk/hello-ai-world.git`
+3. clone the repository with `git clone https://github.com/cootshk/dog-breed-identifier.git`
 4. open the jetson-inference directory `cd jetson-inference`
 5. make a "build" directory `sudo mkdir build`
 6. create the project with CMake `cd build;cmake ../`

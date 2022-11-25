@@ -23,18 +23,22 @@ filename = str(args.filename).replace(".mp4","").replace(".jpg","")
 #Instanciate Detection Objects
 starttime = time.time() #get the time before loading the objectnet
 video_net = jetson_inference.detectNet("coco-dog",['--log-level=error'],threshold=0.5) #load the objectnet
-print(f"\033[0mTime spent to Load Video: {int(time.time()-starttime)} seconds") #find loading duration
+print(f"\033[0mTime spent to load video detection network: {int(time.time()-starttime)} seconds.") #find loading duration
 
 # Define the video Source.
 video_camera = jetson_utils.videoSource(args.device) #define the video camera with -d
 try:
     capture_test = video_camera.Capture() #test if video device exists
+    del capture_test
 except:
-    print()
+    print(f"\033[91mThe {args.device} device is not connected/not a valid video device. Please specify a different device with the -d flag.")
+    exit()
 if headed:
     display = jetson_utils.videoOutput(f"file://{args.filename}.mp4") #create file to stream to window
+    print("Program is running in headed mode. A window will be opened once the program starts.")
 else:
-    print("program is running in headless mode")
+    print("Program is running in headless mode.")
+
 #Instanciate Image Recognition Objects
 starttime = time.time() #get time before loading the imagenet
 image_net = jetson_inference.imageNet('googlenet',['--log-level=error']) #load the aforementioned imagenet
@@ -52,10 +56,9 @@ def detect_breed(detection,img,dogs): # detect breed function
     cudaDeviceSynchronize()
     saveImage(f"{args.filename}.jpg",snapshot) #save the image in the directory specified with -d
     del snapshot
-    dog_img = jetson_utils.loadImage(f"{args.filename}.jpg") #gotta reload that image, man
+    dog_img = jetson_utils.loadImage(f"{args.filename}.jpg") #load the saved image
     dog_idx, dog_confidence = image_net.Classify(dog_img) #classify dog selection
     dog_class_desc = image_net.GetClassDesc(dog_idx) #breed class ids
-    print("program still running")
     if str(dog_class_desc) in dogs: #check if dog
         return (dog_class_desc, dog_idx, dog_confidence)
 

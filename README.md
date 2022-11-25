@@ -1,7 +1,7 @@
 
 # Dog Breed Classifier
 
-![syberian husky](https://www.akc.org/wp-content/uploads/2017/11/Siberian-Husky-standing-outdoors-in-the-winter.jpg)
+![output result](dog.png)
 
 *Note: the [dusty-nv/jetson-inference](https://www.github.com/dusty-nv/jetson-inference) repository is included. If you already have this setup, skip the first few steps.*
 
@@ -39,4 +39,4 @@ THIS PROGRAM REQUIRES A **JETSON NANO**
 9. open the project's root directory `cd path/to/project` (or `cd ../..` if you just finished the above steps)
 10. run either the `breeddetector.py` or the `breeddetector.ipynb` files, and use the flags listed above to open a camera window or change the camera device
 
-[Demonstration](video link)
+## [Demonstration](https://www.youtube.com/watch?v=9TdBDzx1H2I)

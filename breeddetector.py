@@ -5,8 +5,9 @@ from jetson_utils import cudaCrop,cudaDeviceSynchronize,cudaAllocMapped, saveIma
 import argparse
 import time
 import os
+import json
 
-parser = argparse.ArgumentParser(description="Find the breed of dog in an image",formatter_class=argparse.RawTextHelpFormatter,epilog="uh idk what to put here")
+parser = argparse.ArgumentParser(description="Find the breed of dog in an image",formatter_class=argparse.RawTextHelpFormatter,epilog="If you are running over SSH, omit the -h flag")
 parser.add_argument("--headed", "-w",type=bool,default=False,help="True/False, If the camera window should be opened. Defaults to False")
 parser.add_argument("--threashold","-t", type=float, default=.9,help="Percent needed for species identification. Use 0 to disable. Defaults to 0.9")
 parser.add_argument("--device","-d", type=str,default="/dev/video0",help="Camera/RTP Stream to use. Defaults to /dev/video0 (usb camera). Use the command ls /dev/video* to check devices")
@@ -22,7 +23,7 @@ filename = str(args.filename).replace(".mp4","").replace(".jpg","")
 #Instanciate Detection Objects
 starttime = time.time() #get the time before loading the objectnet
 video_net = jetson_inference.detectNet("coco-dog",['--log-level=error'],threshold=0.5) #load the objectnet
-print(f"Time spent to Load Video: {int(time.time()-starttime)} seconds") #find loading duration
+print(f"\033[0m Time spent to Load Video: {int(time.time()-starttime)} seconds") #find loading duration
 
 # Define the video Source.
 video_camera = jetson_utils.videoSource(args.device) #define the video camera with -d
@@ -35,6 +36,11 @@ else:
 starttime = time.time() #get time before loading the imagenet
 image_net = jetson_inference.imageNet('googlenet',['--log-level=error']) #load the aforementioned imagenet
 print(f"Time spent to Create Network: {int(time.time()-starttime)} seconds") #get time after loading the aforementioned aforementioned imagenet, and subtract the aforementioned time before loading the aforementioned aforementioned aforementioned imagenet
+
+#Load dog breed list
+with open("breedlists.json", "r") as f:
+    doglists = json.load(f)
+    dogs = doglists.values()
 
 #its loop time
 dogsdetected = 0
@@ -68,10 +74,13 @@ try:
                 dog_img = jetson_utils.loadImage("dog.jpg") #gotta reload that image, man
                 dog_idx, confidence = image_net.Classify(dog_img) #classify dog selection
                 dog_class_desc = image_net.GetClassDesc(dog_idx) #breed class ids
-                print("image is recognized as '{:s}' (class #{:d}) with {:f}% confidence".format(dog_class_desc, dog_idx, confidence * 100)) #print statement
-                dogsdetected+=1
+                if str(dog_class_desc) in dogs: #check if dog
+                    print("\033[92m image is recognized as '{:s}' (class #{:d}) with {:f}% confidence".format(dog_class_desc, dog_idx, confidence * 100)) #if dog, print results
+                    dogsdetected+=1
+                else:
+                    print(f"\033[93m A dog isn't a {dog_class_desc} (class {dog_idx} with confidence {int(confidence * 100)}%!") #if not a dog
 except Exception as e: #if code is stopped
-    if isinstance(e,KeyboardInterrupt) or isinstance(e,InterruptedError) or e == KeyboardInterrupt or e == InterruptedError: #if Ctrl+C is used
+    if isinstance(e,KeyboardInterrupt) or isinstance(e,InterruptedError) or e == KeyboardInterrupt or e == InterruptedError: #if Ctrl+C is used, ignore my sloppy code please
         print("Stopping!")
         print(f"You found {dogsdetected} dogs!") #cool dog count
     else:

@@ -27,7 +27,10 @@ print(f"\033[0mTime spent to Load Video: {int(time.time()-starttime)} seconds") 
 
 # Define the video Source.
 video_camera = jetson_utils.videoSource(args.device) #define the video camera with -d
-
+try:
+    capture_test = video_camera.Capture() #test if video device exists
+except:
+    print()
 if headed:
     display = jetson_utils.videoOutput(f"file://{args.filename}.mp4") #create file to stream to window
 else:
@@ -42,8 +45,21 @@ with open("breedlists.json", "r") as f:
     doglists = json.load(f)
     dogs = doglists.values()
 
+def detect_breed(detection,img,dogs): # detect breed function
+    roi = (int(detection.Left), int(detection.Top), int(detection.Right), int(detection.Bottom)) #dimensions of boundary box
+    snapshot = cudaAllocMapped(width=roi[2]-roi[0], height=roi[3]-roi[1], format=img.format) #take photo
+    cudaCrop(img, snapshot, roi) #crop photo
+    cudaDeviceSynchronize()
+    saveImage(f"{args.filename}.jpg",snapshot) #save the image in the directory specified with -d
+    del snapshot
+    dog_img = jetson_utils.loadImage(f"{args.filename}.jpg") #gotta reload that image, man
+    dog_idx, dog_confidence = image_net.Classify(dog_img) #classify dog selection
+    dog_class_desc = image_net.GetClassDesc(dog_idx) #breed class ids
+    print("program still running")
+    if str(dog_class_desc) in dogs: #check if dog
+        return (dog_class_desc, dog_idx, dog_confidence)
+
 #its loop time
-dogsdetected = 0
 print("Program starting!")
 while True:
     img = video_camera.Capture() #capture frame
@@ -61,19 +77,11 @@ while True:
         class_desc = video_net.GetClassDesc(class_idx) #descriptions for every class (i.e. Dog), breed identification coming soon
         #print(f"{class_desc} at {class_confidence*100}%") #uncomment this if you want to hear about everything detected (prints "dog at 90%")
        ###Breed identification time (i.e. poodle, husky)
-        if class_desc =="dog" and class_confidence >= int(percentneeded): #if its confident that we found a dog
+        if class_desc =="dog" and class_confidence >= percentneeded: #if its confident that we found a dog
             print(f"\033[0mDog found with {class_confidence * 100}% confidence") #ok we found a dog, time to classify it
-            roi = (int(detection.Left), int(detection.Top), int(detection.Right), int(detection.Bottom)) #dimensions of boundary box
-            snapshot = cudaAllocMapped(width=roi[2]-roi[0], height=roi[3]-roi[1], format=img.format) #take photo
-            cudaCrop(img, snapshot, roi) #crop photo
-            cudaDeviceSynchronize()
-            saveImage(f"{args.filename}.jpg",snapshot) #save the image in the directory specified with -d
-            del snapshot
-            dog_img = jetson_utils.loadImage("dog.jpg") #gotta reload that image, man
-            dog_idx, confidence = image_net.Classify(dog_img) #classify dog selection
-            dog_class_desc = image_net.GetClassDesc(dog_idx) #breed class ids
-            if str(dog_class_desc) in dogs: #check if dog
-                print("\033[92mThe dog is a '{:s}' (class #{:d} with {:f}% confidence)".format(dog_class_desc, dog_idx, confidence * 100)) #if dog, print results
-                dogsdetected+=1
-            else:
-                print(f"\033[93m A dog isn't a {dog_class_desc} (class {dog_idx} with confidence {int(confidence * 100)}%)") #if not a dog
+            try:
+                dog_class_desc, dog_idx, dog_confidence = detect_breed(detection,img,dogs)
+                print("\033[92mThe dog is a '{:s}' (class #{:d} with {:f}% confidence)".format(dog_class_desc, dog_idx, dog_confidence * 100)) #if dog, print results
+            except: 
+                print("\033[91mCould not identify dog breed.")
+            

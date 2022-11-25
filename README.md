@@ -1,5 +1,7 @@
-![syberian husky](https://www.akc.org/wp-content/uploads/2017/11/Siberian-Husky-standing-outdoors-in-the-winter.jpg)
+
 # Dog Breed Classifier
+
+![syberian husky](https://www.akc.org/wp-content/uploads/2017/11/Siberian-Husky-standing-outdoors-in-the-winter.jpg)
 
 *Note: the [dusty-nv/jetson-inference](https://www.github.com/dusty-nv/jetson-inference) repository is included. If you already have this setup, skip the first few steps.*
 
@@ -24,6 +26,7 @@ Step Four: output and repeat: Outputs the specified breed, then repeats back to 
 
 ## Running this project
 THIS PROGRAM REQUIRES A **JETSON NANO**
+### Installing the [Jetson-Inference]() library
 1. update and install git and cmake `sudo apt update;sudo apt upgrade;sudo apt install git cmake`
 2. install the required python packages `sudo apt install libpython3-dev python3-numpy`
 3. clone the repository with `sudo git clone --recursive https://github.com/cootshk/hello-ai-world.git`

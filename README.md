@@ -7,7 +7,7 @@
 
 ## The Algorithm
 
-Step One: arguements (python script): use flags if you need them. Flags:
+Step One: arguments (python script): use flags if you need them. Flags:
 ```
 -h True or --headed True: shows the camera window (warning: can be very laggy) (default is False)
 -t {number} or --threashold {number}: how confident you have to be that there's a dog to determine species (default is 0.9)

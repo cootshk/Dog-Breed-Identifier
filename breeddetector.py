@@ -64,6 +64,7 @@ def detect_breed(detection,img,dogs): # detect breed function
 
 #its loop time
 print("Program starting!")
+print(f"The latest dog identified will be stored at {filename}.jpg")
 while True:
     img = video_camera.Capture() #capture frame
     detections = video_net.Detect(img) #start detection
